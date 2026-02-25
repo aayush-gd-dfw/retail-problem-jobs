@@ -15,9 +15,9 @@ GRAPH = "https://graph.microsoft.com/v1.0"
 # HARD-CODED AUTH CONFIG (EDIT THESE 3)
 # =========================================================
 
-TENANT_ID = os.getenv("GMAIL_ADDRESS")
-CLIENT_ID = os.getenv("GMAIL_ADDRESS")
-CLIENT_SECRET = os.getenv("GMAIL_ADDRESS")
+TENANT_ID = os.getenv("TENANT_ID")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 # =========================================================
 
 # -------------------- CONFIG --------------------
