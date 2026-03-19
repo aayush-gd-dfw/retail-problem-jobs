@@ -35,11 +35,11 @@ FIELDS = {
 
 # BU -> assigned email mapping (normalize_key() is used)
 ASSIGNED_MAP = {
-    "dallas": "amunoz@GlassDoctorDFW.com",
-    "carrollton": "amunoz@GlassDoctorDFW.com",
-    "arlington": "ayeamans@glassdoctordfw.com",
-    "colleyville": "ayeamans@glassdoctordfw.com",
-    "denton": "ayeamans@glassdoctordfw.com"
+    "dallas": "NSalser@glassdoctordfw.com",
+    "carrollton": "NSalser@glassdoctordfw.com",
+    "arlington": "NSalser@glassdoctordfw.com",
+    "colleyville": "NSalser@glassdoctordfw.com",
+    "denton": "NSalser@glassdoctordfw.com"
 }
 
 # -------------------- Small helpers --------------------
