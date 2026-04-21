@@ -4,10 +4,6 @@ import base64
 import os
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Tuple
-from datetime import datetime
-import pytz
-
-central = pytz.timezone("America/Chicago")
 
 import requests
 from msal import ConfidentialClientApplication
@@ -34,8 +30,8 @@ FIELDS = {
     "customer_name": "CustomerName",
     "job_amount": "JobAmount",
     "next_appt_date": "NextApptDate",
-    "assigned_to": "EmployeeName",   
-    "date_of_error": "DateofError",  # ✅ ADDED# TEXT column now
+    "assigned_to": "EmployeeName",
+    "date_of_error": "DateofError",
 }
 
 # BU -> assigned email mapping (normalize_key() is used)
@@ -103,6 +99,13 @@ def try_parse_excel_date(v) -> Optional[str]:
         return f"{d}T00:00:00Z"
     except Exception:
         return None
+
+def today_date_only() -> str:
+    """
+    For SharePoint Date Only columns.
+    Returns: YYYY-MM-DD
+    """
+    return datetime.utcnow().date().isoformat()
 
 # -------------------- Auth --------------------
 def get_graph_token() -> str:
@@ -260,7 +263,6 @@ def print_list_columns(token: str, site_id: str, list_id: str) -> None:
     for c in cols.get("value", []):
         print(f"{c.get('displayName')} -> {c.get('name')}")
 
-
 # -------------------- Main --------------------
 def main():
     graph_token = get_graph_token()
@@ -274,8 +276,8 @@ def main():
     list_name = "Retail Problem/Incomplete Ops Job"
 
     site_id, list_id = get_site_and_list_ids(graph_token, hostname, site_path, list_name)
-    #print_list_columns(graph_token, site_id, list_id)
-    #return
+    # print_list_columns(graph_token, site_id, list_id)
+    # return
 
     # Find latest email
     msg = latest_message_for_subject(graph_token, mailbox_upn, SUBJECT)
@@ -330,10 +332,7 @@ def main():
             FIELDS["customer_name"]: str(r[cust_col]).strip(),
             FIELDS["job_amount"]: parse_money(r[sub_col]),
             FIELDS["assigned_to"]: assigned_email,
-            FIELDS["date_of_error"]: datetime.utcnow().strftime("%Y-%m-%dT00:00:00Z")  # 👈 ADD THIS LINE
         }
-        if next_dt:
-            fields_payload[FIELDS["next_appt_date"]] = next_dt
 
         existing_id = existing_map.get(job_number)
 
@@ -342,16 +341,26 @@ def main():
             created = create_item(graph_token, site_id, list_id, {FIELDS["job_number"]: job_number})
             new_id = created["id"]
 
-            # Patch remaining fields (excluding Title)
+            # Patch remaining fields (excluding Title) for NEW items only
             patch_fields = dict(fields_payload)
             patch_fields.pop(FIELDS["job_number"], None)
+            patch_fields[FIELDS["date_of_error"]] = today_date_only()
+
+            if next_dt:
+                patch_fields[FIELDS["next_appt_date"]] = next_dt
 
             if patch_fields:
                 update_item_fields(graph_token, site_id, list_id, new_id, patch_fields)
 
             existing_map[job_number] = new_id
         else:
-            update_item_fields(graph_token, site_id, list_id, existing_id, fields_payload)
+            # Update existing item WITHOUT changing DateofError
+            update_fields = dict(fields_payload)
+
+            if next_dt:
+                update_fields[FIELDS["next_appt_date"]] = next_dt
+
+            update_item_fields(graph_token, site_id, list_id, existing_id, update_fields)
 
         upserts += 1
 
