@@ -4,6 +4,10 @@ import base64
 import os
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Tuple
+from datetime import datetime
+import pytz
+
+central = pytz.timezone("America/Chicago")
 
 import requests
 from msal import ConfidentialClientApplication
@@ -30,7 +34,8 @@ FIELDS = {
     "customer_name": "CustomerName",
     "job_amount": "JobAmount",
     "next_appt_date": "NextApptDate",
-    "assigned_to": "EmployeeName",      # TEXT column now
+    "assigned_to": "EmployeeName",   
+    "date_of_error": "DateofError",  # ✅ ADDED# TEXT column now
 }
 
 # BU -> assigned email mapping (normalize_key() is used)
