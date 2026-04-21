@@ -324,7 +324,8 @@ def main():
             FIELDS["job_number"]: job_number,
             FIELDS["customer_name"]: str(r[cust_col]).strip(),
             FIELDS["job_amount"]: parse_money(r[sub_col]),
-            FIELDS["assigned_to"]: assigned_email,  # TEXT column
+            FIELDS["assigned_to"]: assigned_email,
+            FIELDS["date_of_error"]: datetime.utcnow().strftime("%Y-%m-%dT00:00:00Z")  # 👈 ADD THIS LINE
         }
         if next_dt:
             fields_payload[FIELDS["next_appt_date"]] = next_dt
